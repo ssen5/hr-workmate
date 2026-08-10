@@ -68,17 +68,7 @@ Create a `.env` file in the project root:
 GROQ_API_KEY=your_key_here
 ```
 
-### 3. Set up the database
-
-```bash
-cd database
-python init_db.py
-cd ..
-```
-
-This creates `mydb.db` with sample employees, leave requests, and payroll records. Use `database/update_db.py` afterward for any incremental changes (new tables, columns, or rows) without wiping existing data.
-
-### 4. Build the policy knowledge base
+### 3. Build the policy knowledge base
 
 ```bash
 python ingest.py
@@ -86,7 +76,7 @@ python ingest.py
 
 This reads `policy.pdf`, splits it into chunks, embeds them, and stores them in a local Chroma vector index (`chroma_policy_db/`). Only needs to be re-run if `policy.pdf` changes.
 
-### 5. Run the assistant
+### 4. Run the assistant
 
 ```bash
 python main.py
