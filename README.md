@@ -38,14 +38,15 @@ It combines:
 hr-workmate/
 ├── .env                     # holds GROQ_API_KEY
 ├── policy.pdf               # source HR policy document
-├── ingest.py                # builds the Chroma vector index from policy.pdf
-├── vectorstore.py           # shared Chroma load/config helper
-├── tools.py                 # all tool definitions (policy lookup, DB queries, leave actions)
-├── main.py                  # entry point — chat loop
 ├── database/
 │   ├── init_db.py           # creates tables + seeds sample data (run once)
 │   ├── update_db.py         # incremental DB changes (new tables, columns, rows)
 │   └── mydb.db              # generated SQLite database
+├── rag/
+|   ├── ingest.py            # builds the Chroma vector index from policy.pdf
+|   ├── vectorstore.py       # shared Chroma load/config helper
+├── tools.py                 # all tool definitions (policy lookup, DB queries, leave actions)
+├── main.py                  # entry point — chat loop
 └── chroma_policy_db/        # generated vector index (from ingest.py)
 ```
 
