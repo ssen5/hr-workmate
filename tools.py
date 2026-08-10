@@ -1,6 +1,8 @@
 import sqlite3
 import os
 
+import colorama
+
 from datetime import datetime
 from langchain_core.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -231,7 +233,7 @@ def make_tools(llm, chat_history, current_employee_id):
     @tool
     def query_database(sql_query: str, original_question: str) -> str:
         """Run a READ-ONLY SQL SELECT query against the HR database to answer employee
-        questions about leave balance, leave requests, or employee records.
+        questions about leave balance, leave requests, payroll/salary, or employee records.
 
         Database schema:
 
@@ -264,14 +266,34 @@ def make_tools(llm, chat_history, current_employee_id):
           - approved_by (INTEGER, references employees.employee_id, nullable)
           - approved_on (TEXT, datetime, nullable)
 
+        Table: payroll
+          - payroll_id (INTEGER, primary key)
+          - employee_id (INTEGER, references employees.employee_id)
+          - month (TEXT, e.g. 'August')
+          - year (INTEGER)
+          - basic_salary (REAL)
+          - hra (REAL)
+          - special_allowance (REAL)
+          - gross_salary (REAL)
+          - deductions (REAL)
+          - net_salary (REAL)
+          - payment_status (TEXT: 'paid' or 'pending')
+          - payment_date (TEXT, datetime, nullable)
+
         Rules:
         - Only generate SELECT statements. Never generate INSERT, UPDATE, DELETE, or DROP.
         - Always filter by employee_id when the question is about a specific person.
         - Use exact lowercase values for leave_type ('casual', 'sick', 'earned') and
           status ('pending', 'approved', 'rejected').
+        - Use exact lowercase values for payment_status ('paid', 'pending').
+        - When the question involves salary/payroll but doesn't specify a month/year,
+          default to the most recent record (ORDER BY year DESC, and match month names
+
+          against the current month if relevant) rather than assuming a specific one.
         - Also pass the employee's original question as `original_question`, so the
           result can be phrased back in plain language.
         """
+
         query_clean = sql_query.strip().rstrip(";")
 
         if not query_clean.lower().startswith("select"):

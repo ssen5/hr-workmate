@@ -1,9 +1,14 @@
 import os
+import colorama
+
 from dotenv import load_dotenv
 
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_groq import ChatGroq
+
+from datetime import datetime
+
 
 from tools import make_tools
 from rag.vectorstore import CHROMA_DIR
@@ -38,16 +43,22 @@ tool_map = {t.name: t for t in tools}
 
 # ---------- Main prompt (history-aware, identity-aware) ----------
 
+today_date = datetime.now().strftime("%Y-%m-%d")
+
 main_prompt = ChatPromptTemplate.from_messages([
     ("system", f"""You are an HR assistant for employees.
 
-The employee you are currently talking to has employee_id={CURRENT_EMPLOYEE_ID}.
-Always use this employee_id for any database lookup or action — never ask the
-employee for their ID or email, you already know it.
+                    Today's date is {today_date}.
+                    When calculating relative dates like "tomorrow" or "next week", use this as the reference point.
 
-Use your tools to answer HR policy questions, database lookups (leave balance,
-leave requests), or actions (like applying for leave). For anything unrelated
-to HR, politely say you can only help with HR-related topics."""),
+                    The employee you are currently talking to has employee_id={CURRENT_EMPLOYEE_ID}.
+                    Always use this employee_id for any database lookup or action — never ask the
+                    employee for their ID or email, you already know it.
+
+                    Use your tools to answer HR policy questions, database lookups (leave balance,
+                    leave requests, payroll/salary details), or actions (like applying for leave
+                    or approving/rejecting leave requests). For anything unrelated to HR, politely
+                    say you can only help with HR-related topics."""),
     MessagesPlaceholder(variable_name="chat_history"),
     ("human", "{input}")
 ])
@@ -62,7 +73,7 @@ def main():
     print(f"HR Assistant ready (employee_id={CURRENT_EMPLOYEE_ID}). Type 'exit' to quit.\n")
 
     while True:
-        information = input("You: ")
+        information = input(colorama.Fore.GREEN + "You: ")
         if information.strip().lower() == "exit":
             break
 
@@ -96,7 +107,7 @@ def main():
         else:
             answer = response.content
 
-        print(f"\nBot: {answer}\n")
+        print(colorama.Fore.WHITE + f"\nBot: {answer}\n")
 
         chat_history.append(HumanMessage(content=information))
         chat_history.append(AIMessage(content=answer))
