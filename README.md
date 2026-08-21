@@ -71,6 +71,7 @@ GROQ_API_KEY=your_key_here
 ### 3. Build the policy knowledge base
 
 ```bash
+cd rag
 python ingest.py
 ```
 
@@ -79,6 +80,7 @@ This reads `policy.pdf`, splits it into chunks, embeds them, and stores them in 
 ### 4. Run the assistant
 
 ```bash
+cd ..
 python main.py
 ```
 
