@@ -19,13 +19,12 @@ It combines:
 - Hold a natural, multi-turn conversation — it remembers context within a session (e.g. it won't ask for your employee ID twice)
 
 ---
-
 ## Tech Stack
 
 | Component | Tool |
 |---|---|
 | LLM | Groq (`openai/gpt-oss-120b`) via `langchain-groq` |
-| Orchestration | LangChain (native tool-calling, `bind_tools`) |
+| Orchestration | LangChain (`create_agent`, prebuilt tool-calling agent loop) |
 | Policy retrieval | Chroma (vector store) + HuggingFace sentence-transformer embeddings |
 | Structured data | SQLite |
 | PDF parsing | `PyPDFLoader` |
